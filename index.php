@@ -1,26 +1,25 @@
 <?php
-if (!defined('ABSPATH')) exit;
+/**
+ * Main template file for Base47 Theme
+ */
 
-?><!DOCTYPE html>
-<html <?php language_attributes(); ?>>
-<head>
-    <meta charset="<?php bloginfo('charset'); ?>">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <?php wp_head(); ?>
-</head>
+get_header();
+?>
 
-<body <?php body_class(); ?>>
-    <main>
-        <?php
-        if (have_posts()):
-            while (have_posts()):
-                the_post();
-                the_content();
-            endwhile;
-        endif;
-        ?>
-    </main>
+<?php
+if ( have_posts() ) :
+    while ( have_posts() ) :
+        the_post();
 
-<?php wp_footer(); ?>
-</body>
-</html>
+        // For your Mivon-based pages, the HTML will usually come from a shortcode
+        // inside the page content. We just output the_content() and stay out of the way.
+        the_content();
+
+    endwhile;
+else :
+    echo '<p>' . esc_html__( 'No content found.', 'base47-theme' ) . '</p>';
+endif;
+?>
+
+<?php
+get_footer();
