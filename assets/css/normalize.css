@@ -1,0 +1,32 @@
+/* Base47 minimal helpers – safe for all HTML templates */
+
+/* Smooth mobile scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Make all images responsive */
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* Remove body margins */
+body {
+    margin: 0;
+    padding: 0;
+}
+
+/* Disable ugly blue tap highlight on mobile */
+* {
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Safe container (not used by Mivon, but available) */
+.base47-container {
+    width: 100%;
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
