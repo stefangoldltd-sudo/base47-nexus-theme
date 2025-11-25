@@ -47,7 +47,7 @@ add_action('wp_enqueue_scripts', function () {
         'base47-style',
         get_stylesheet_uri(),
         ['base47-normalize'],
-        '1.2.3'   // <== must match style.css version!
+        'v1.5.1'   // <== must match style.css version!
     );
 });
 
@@ -76,7 +76,7 @@ remove_filter('the_excerpt', 'wpautop');
 add_filter('wp_calculate_image_srcset', '__return_false');
 
 // -------------------------------
-// Base47 GitHub Theme Updater
+// Base47 GitHub Theme Updater (Corrected)
 // -------------------------------
 function base47_github_updater( $transient ) {
 
@@ -84,9 +84,13 @@ function base47_github_updater( $transient ) {
         return $transient;
     }
 
-    $theme = wp_get_theme( 'base47' );
+    // Theme folder MUST match your theme directory name
+    $theme_slug = 'base47-theme';
+
+    $theme = wp_get_theme( $theme_slug );
     $current_version = $theme->get( 'Version' );
 
+    // GitHub API for latest release
     $response = wp_remote_get( 'https://api.github.com/repos/stefangoldltd-sudo/base47-theme/releases/latest' );
     
     if ( is_wp_error( $response ) ) {
@@ -101,8 +105,9 @@ function base47_github_updater( $transient ) {
 
         if ( version_compare( $current_version, $latest_version, '<' ) ) {
 
-            $transient->response['base47'] = array(
-                'theme'       => 'base47',
+            // Must match your theme slug
+            $transient->response[$theme_slug] = array(
+                'theme'       => $theme_slug,
                 'new_version' => $latest_version,
                 'package'     => $data->zipball_url,
                 'url'         => 'https://github.com/stefangoldltd-sudo/base47-theme',
