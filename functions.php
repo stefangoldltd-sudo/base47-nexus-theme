@@ -3,6 +3,7 @@
 /* ---------------------------------------------
    Base47 Theme – Minimal + Useful
    Optimized for raw HTML templates and Mivon HTML Editor
+   Version 1.6.0 - Mobile Layout Fix
 --------------------------------------------- */
 
 // Disable Gutenberg everywhere (we are raw HTML people)
@@ -12,11 +13,15 @@ add_filter('use_block_editor_for_post', '__return_false', 10);
 remove_action('wp_head', 'print_emoji_detection_script', 7);
 remove_action('wp_print_styles', 'print_emoji_styles');
 
-// Disable WP’s default frontend styles that break designs
+// Disable WP's default frontend styles that break designs
 add_action('wp_enqueue_scripts', function () {
     wp_dequeue_style('wp-block-library');
     wp_dequeue_style('wp-block-library-theme');
     wp_dequeue_style('global-styles');
+    
+    // FIX: Remove classic-theme-styles that breaks mobile layout
+    wp_dequeue_style('classic-theme-styles');
+    wp_deregister_style('classic-theme-styles');
 }, 100);
 
 
@@ -26,31 +31,12 @@ add_action('wp_enqueue_scripts', function () {
 
 add_action('wp_enqueue_scripts', function () {
 
-    // OPTIONAL: if you want normalize, leave this.
-    // If you want 100% identical to live editor, comment it out.
-    /*
-    wp_enqueue_style(
-        'base47-normalize',
-        get_template_directory_uri() . '/assets/css/normalize.css',
-        [],
-        '8.0'
-    );
-    */
-
-    // DO NOT LOAD base47-core anymore – it’s the one that changes layout.
-    // wp_enqueue_style(
-    //     'base47-core',
-    //     get_template_directory_uri() . '/assets/css/base47-core.css',
-    //     [],
-    //     '1.0'
-    // );
-
     // MAIN THEME STYLESHEET – keep it ultra-minimal
     wp_enqueue_style(
         'base47-style',
         get_stylesheet_uri(),
         [],
-        '1.5.3'
+        '1.6.0'
     );
 });
 
@@ -77,6 +63,23 @@ remove_filter('the_excerpt', 'wpautop');
 --------------------------------------------- */
 
 add_filter('wp_calculate_image_srcset', '__return_false');
+
+
+/* ---------------------------------------------
+   FIX: Remove WordPress body classes that trigger mobile CSS
+--------------------------------------------- */
+
+add_filter('body_class', function($classes) {
+    // Remove WordPress-specific classes that might trigger unwanted CSS
+    $remove_classes = array(
+        'wp-embed-responsive',
+        'wp-custom-logo',
+        'wp-block-theme'
+    );
+    
+    return array_diff($classes, $remove_classes);
+});
+
 
 // -------------------------------
 // Base47 GitHub Theme Updater (Corrected)
