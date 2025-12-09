@@ -19,7 +19,7 @@ function base47_theme_get_version() {
         $theme = $theme->parent();
     }
     $version = $theme->get( 'Version' );
-    return $version ? $version : '2.1.0';
+    return $version ? $version : '2.1.1';
 }
 
 /* ---------------------------------------------
