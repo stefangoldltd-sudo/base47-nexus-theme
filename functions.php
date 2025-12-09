@@ -128,16 +128,34 @@ function base47_theme_scripts() {
         $ver
     );
 
-    // Soft-UI for classic mode ONLY (not for Canvas template)
-    $softui_path = get_template_directory() . '/assets/css/base47-softui.css';
-    if ( ! is_page_template( 'template-canvas.php' ) && file_exists( $softui_path ) ) {
-        wp_enqueue_style(
-            'base47-softui',
-            $dir . '/assets/css/base47-softui.css',
-            array( 'base47-style' ),
-            $ver
-        );
+// Detect if current page is Canvas Mode
+$is_canvas = false;
+
+if ( is_singular() ) {
+    $post_id = get_the_ID();
+
+    // Meta box flag
+    $meta_canvas = get_post_meta( $post_id, '_base47_canvas_mode', true );
+
+    // Detect template AFTER WP resolves hierarchy
+    $template = get_page_template_slug( $post_id );
+
+    if ( $meta_canvas === '1' || $template === 'template-canvas.php' ) {
+        $is_canvas = true;
     }
+}
+
+// Load Soft-UI ONLY if NOT Canvas Mode
+$softui_path = get_template_directory() . '/assets/css/base47-softui.css';
+if ( ! $is_canvas && file_exists( $softui_path ) ) {
+
+    wp_enqueue_style(
+        'base47-softui',
+        $dir . '/assets/css/base47-softui.css',
+        array( 'base47-style' ),
+        $ver
+    );
+}
 
     // Optional theme JS – safe even if file is empty
     $js_path = get_template_directory() . '/assets/js/theme.js';

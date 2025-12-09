@@ -1,34 +1,26 @@
 <?php
 /**
- * Template Name: Base47 Canvas (No WordPress Wrappers)
- * Description: Pure HTML output
- * 
- * This template completely bypasses WordPress wrappers
- * Perfect for base47 HTML Editor templates
+ * Template Name: Base47 Canvas (Raw HTML Mode)
  */
+
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
 ?>
 <!DOCTYPE html>
 <html <?php language_attributes(); ?>>
 <head>
     <meta charset="<?php bloginfo('charset'); ?>">
-    
-    <!-- Enhanced viewport for mobile - iOS Safari fix -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    
-    <!-- iOS-specific optimizations -->
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="format-detection" content="telephone=no">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <?php wp_head(); ?>
 </head>
-<body <?php body_class('base47-canvas'); ?>>
+
+<body class="base47-canvas">
 
 <?php
-// PURE HTML OUTPUT - NO WRAPPERS AT ALL
 while ( have_posts() ) : the_post();
-    the_content();
+    // OUTPUT RAW HTML ONLY
+    echo do_shortcode( get_the_content( null, false, $post ) );
 endwhile;
 ?>
 
