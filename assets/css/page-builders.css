@@ -1,0 +1,230 @@
+/**
+ * Base47 Theme - Page Builder Compatibility CSS
+ * Ensures all page builders work perfectly with Base47 theme
+ */
+
+/* =============================================
+   ELEMENTOR COMPATIBILITY
+============================================= */
+
+/* Elementor Canvas Mode */
+.elementor-page .entry-content {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+}
+
+/* Elementor Full Width */
+.elementor-section.elementor-section-boxed > .elementor-container {
+    max-width: var(--container-width, 1200px);
+}
+
+/* Elementor Widgets */
+.elementor-widget-heading h1,
+.elementor-widget-heading h2,
+.elementor-widget-heading h3,
+.elementor-widget-heading h4,
+.elementor-widget-heading h5,
+.elementor-widget-heading h6 {
+    margin: 0;
+    line-height: 1.2;
+}
+
+/* =============================================
+   BEAVER BUILDER COMPATIBILITY
+============================================= */
+
+/* Beaver Builder Canvas */
+.fl-builder-page .entry-content {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Beaver Builder Modules */
+.fl-module-content {
+    box-sizing: border-box;
+}
+
+/* =============================================
+   VISUAL COMPOSER (WPBAKERY) COMPATIBILITY
+============================================= */
+
+/* Visual Composer Canvas */
+.vc-page .entry-content {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Visual Composer Rows */
+.vc_row {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+}
+
+/* =============================================
+   DIVI BUILDER COMPATIBILITY
+============================================= */
+
+/* Divi Canvas */
+.divi-page .entry-content {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Divi Sections */
+.et_pb_section {
+    padding: 0;
+}
+
+/* =============================================
+   GUTENBERG BLOCK EDITOR ENHANCEMENTS
+============================================= */
+
+/* Wide and Full Width Blocks */
+.wp-block {
+    max-width: var(--container-width, 1200px);
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.alignwide {
+    width: 100vw;
+    max-width: 100vw;
+    margin-left: calc(50% - 50vw);
+    margin-right: calc(50% - 50vw);
+}
+
+.alignfull {
+    width: 100vw;
+    max-width: 100vw;
+    margin-left: calc(50% - 50vw);
+    margin-right: calc(50% - 50vw);
+}
+
+/* Block Color Palette */
+.has-primary-color {
+    color: var(--primary-color, #ff4d00) !important;
+}
+
+.has-primary-background-color {
+    background-color: var(--primary-color, #ff4d00) !important;
+}
+
+.has-secondary-color {
+    color: var(--secondary-color, #333333) !important;
+}
+
+.has-secondary-background-color {
+    background-color: var(--secondary-color, #333333) !important;
+}
+
+.has-text-color {
+    color: var(--text-color, #666666) !important;
+}
+
+.has-text-background-color {
+    background-color: var(--text-color, #666666) !important;
+}
+
+/* =============================================
+   OXYGEN BUILDER COMPATIBILITY
+============================================= */
+
+/* Oxygen Canvas */
+.oxygen-body .entry-content {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* =============================================
+   BRICKS BUILDER COMPATIBILITY
+============================================= */
+
+/* Bricks Canvas */
+.bricks-page .entry-content {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* =============================================
+   THRIVE ARCHITECT COMPATIBILITY
+============================================= */
+
+/* Thrive Architect Canvas */
+.tve_lp .entry-content {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* =============================================
+   GENERAL PAGE BUILDER FIXES
+============================================= */
+
+/* Remove WordPress default margins/padding for all page builders */
+.elementor-page .entry-content,
+.fl-builder-page .entry-content,
+.vc-page .entry-content,
+.divi-page .entry-content,
+.oxygen-body .entry-content,
+.bricks-page .entry-content,
+.tve_lp .entry-content {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+}
+
+/* Ensure page builders work in canvas mode */
+body.base47-canvas .elementor-section,
+body.base47-canvas .fl-row,
+body.base47-canvas .vc_row,
+body.base47-canvas .et_pb_section,
+body.base47-canvas .ct-section,
+body.base47-canvas .brxe-section {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    max-width: 100%;
+}
+
+/* Mobile Responsiveness for Page Builders */
+@media (max-width: 768px) {
+    .elementor-page .entry-content,
+    .fl-builder-page .entry-content,
+    .vc-page .entry-content,
+    .divi-page .entry-content {
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+    
+    /* Ensure mobile layouts work */
+    .elementor-section,
+    .fl-row,
+    .vc_row,
+    .et_pb_section {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+    }
+}
+
+/* =============================================
+   BASE47 HTML EDITOR INTEGRATION
+============================================= */
+
+/* Ensure Base47 templates work with page builders */
+body.base47-canvas [class*="base47-"],
+body.base47-canvas [class*="mivon-"] {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+}
+
+/* Page builder + Base47 template compatibility */
+.elementor-page [class*="base47-"],
+.fl-builder-page [class*="base47-"],
+.vc-page [class*="base47-"],
+.divi-page [class*="base47-"] {
+    box-sizing: border-box;
+}

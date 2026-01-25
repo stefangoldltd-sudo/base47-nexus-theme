@@ -1,7 +1,7 @@
 <?php
 /**
- * Base47 Theme – Dual Mode (Canvas + Classic)
- * Optimized for raw HTML templates and Base47 HTML Editor
+ * Nexus Theme – Dual Mode (Canvas + Classic)
+ * The perfect nexus between HTML templates and WordPress
  * 
  */
 
@@ -18,21 +18,21 @@ if ( file_exists( $debug_file ) ) {
 /**
  * Helper: get current theme version for cache-busting.
  */
-function base47_theme_get_version() {
+function nexus_theme_get_version() {
     $theme = wp_get_theme();
     // If this is a child theme, get parent version
     if ( $theme->parent() ) {
         $theme = $theme->parent();
     }
     $version = $theme->get( 'Version' );
-    return $version ? $version : '2.1.0';
+    return $version ? $version : '3.0.0';
 }
 
 /* ---------------------------------------------
  * Theme setup
  * ------------------------------------------ */
 
-function base47_theme_setup() {
+function nexus_theme_setup() {
 
     // Let WordPress handle <title> tag
     add_theme_support( 'title-tag' );
@@ -53,10 +53,10 @@ function base47_theme_setup() {
 
     // Primary navigation (for classic mode header)
     register_nav_menus( array(
-        'primary' => __( 'Primary Menu', 'base47-theme' ),
+        'primary' => __( 'Primary Menu', 'nexus-theme' ),
     ) );
 }
-add_action( 'after_setup_theme', 'base47_theme_setup' );
+add_action( 'after_setup_theme', 'nexus_theme_setup' );
 
 /* ---------------------------------------------
  * Disable Gutenberg (Block Editor)
@@ -64,17 +64,17 @@ add_action( 'after_setup_theme', 'base47_theme_setup' );
  * If you ever want it ONLY for pages, you can change the condition.
  * ------------------------------------------ */
 
-function base47_disable_block_editor_for_all( $use_block_editor, $post_type ) {
+function nexus_disable_block_editor_for_all( $use_block_editor, $post_type ) {
     // Return false for all post types (pages, posts, custom)
     return false;
 }
-add_filter( 'use_block_editor_for_post_type', 'base47_disable_block_editor_for_all', 10, 2 );
+add_filter( 'use_block_editor_for_post_type', 'nexus_disable_block_editor_for_all', 10, 2 );
 
 /* ---------------------------------------------
  * Disable WP emojis (extended version of your original)
  * ------------------------------------------ */
 
-function base47_disable_emojis() {
+function nexus_disable_emojis() {
     remove_action( 'wp_head', 'print_emoji_detection_script', 7 );
     remove_action( 'admin_print_scripts', 'print_emoji_detection_script' );
     remove_action( 'wp_print_styles', 'print_emoji_styles' );
@@ -83,14 +83,14 @@ function base47_disable_emojis() {
     remove_filter( 'comment_text_rss', 'wp_staticize_emoji' );
     remove_filter( 'wp_mail', 'wp_staticize_emoji_for_email' );
 }
-add_action( 'init', 'base47_disable_emojis' );
+add_action( 'init', 'nexus_disable_emojis' );
 
 /* ---------------------------------------------
  * Remove WP block/global styles that break designs
  * (keeps your original behavior)
  * ------------------------------------------ */
 
-function base47_theme_dequeue_wp_styles() {
+function nexus_theme_dequeue_wp_styles() {
     wp_dequeue_style( 'wp-block-library' );
     wp_dequeue_style( 'wp-block-library-theme' );
     wp_dequeue_style( 'global-styles' );
@@ -98,7 +98,7 @@ function base47_theme_dequeue_wp_styles() {
     wp_dequeue_style( 'classic-theme-styles' );
     wp_deregister_style( 'classic-theme-styles' );
 }
-add_action( 'wp_enqueue_scripts', 'base47_theme_dequeue_wp_styles', 100 );
+add_action( 'wp_enqueue_scripts', 'nexus_theme_dequeue_wp_styles', 100 );
 
 /* ---------------------------------------------
  * Enqueue our CSS + JS
@@ -108,66 +108,65 @@ add_action( 'wp_enqueue_scripts', 'base47_theme_dequeue_wp_styles', 100 );
  * - theme.js
  * ------------------------------------------ */
 
-function base47_theme_scripts() {
-    $ver = base47_theme_get_version();
+function nexus_theme_scripts() {
+    $ver = nexus_theme_get_version();
     $dir = get_template_directory_uri();
 
     // Optional normalize/reset if you add it later
     $normalize_path = get_template_directory() . '/assets/css/normalize.css';
     if ( file_exists( $normalize_path ) ) {
         wp_enqueue_style(
-            'base47-normalize',
+            'nexus-normalize',
             $dir . '/assets/css/normalize.css',
             array(),
             $ver
         );
-        $deps = array( 'base47-normalize' );
+        $deps = array( 'nexus-normalize' );
     } else {
         $deps = array();
     }
 
-    // MAIN THEME STYLESHEET – your original "base47-style"
+    // MAIN THEME STYLESHEET
     wp_enqueue_style(
-        'base47-style',
+        'nexus-style',
         get_stylesheet_uri(),
         $deps,
         $ver
     );
 
-// Detect if current page is Canvas Mode
-$is_canvas = false;
+    // Detect if current page is Canvas Mode
+    $is_canvas = false;
 
-if ( is_singular() ) {
-    $post_id = get_the_ID();
+    if ( is_singular() ) {
+        $post_id = get_the_ID();
 
-    // Meta box flag
-    $meta_canvas = get_post_meta( $post_id, '_base47_canvas_mode', true );
+        // Meta box flag
+        $meta_canvas = get_post_meta( $post_id, '_nexus_canvas_mode', true );
 
-    // Detect template AFTER WP resolves hierarchy
-    $template = get_page_template_slug( $post_id );
+        // Detect template AFTER WP resolves hierarchy
+        $template = get_page_template_slug( $post_id );
 
-    if ( $meta_canvas === '1' || $template === 'template-canvas.php' ) {
-        $is_canvas = true;
+        if ( $meta_canvas === '1' || $template === 'template-canvas.php' ) {
+            $is_canvas = true;
+        }
     }
-}
 
-// Load Soft-UI ONLY if NOT Canvas Mode
-$softui_path = get_template_directory() . '/assets/css/base47-softui.css';
-if ( ! $is_canvas && file_exists( $softui_path ) ) {
-
-    wp_enqueue_style(
-        'base47-softui',
-        $dir . '/assets/css/base47-softui.css',
-        array( 'base47-style' ),
-        $ver
-    );
-}
+    // Load Soft-UI ONLY if NOT Canvas Mode
+    $softui_path = get_template_directory() . '/assets/css/nexus-softui.css';
+    if ( ! $is_canvas && file_exists( $softui_path ) ) {
+        wp_enqueue_style(
+            'nexus-softui',
+            $dir . '/assets/css/nexus-softui.css',
+            array( 'nexus-style' ),
+            $ver
+        );
+    }
 
     // Optional theme JS – safe even if file is empty
     $js_path = get_template_directory() . '/assets/js/theme.js';
     if ( file_exists( $js_path ) ) {
         wp_enqueue_script(
-            'base47-theme',
+            'nexus-theme',
             $dir . '/assets/js/theme.js',
             array( 'jquery' ),
             $ver,
@@ -175,7 +174,7 @@ if ( ! $is_canvas && file_exists( $softui_path ) ) {
         );
     }
 }
-add_action( 'wp_enqueue_scripts', 'base47_theme_scripts' );
+add_action( 'wp_enqueue_scripts', 'nexus_theme_scripts' );
 
 /* ---------------------------------------------
  * RAW HTML: Remove automatic <p> / <br> wrappers
@@ -213,32 +212,32 @@ add_filter( 'body_class', function( $classes ) {
 
 add_action( 'add_meta_boxes', function() {
     add_meta_box(
-        'base47_canvas_mode',
-        'Base47 Canvas Mode',
-        'base47_canvas_mode_callback',
+        'nexus_canvas_mode',
+        'Nexus Canvas Mode',
+        'nexus_canvas_mode_callback',
         'page',
         'side',
         'high'
     );
 } );
 
-function base47_canvas_mode_callback( $post ) {
-    wp_nonce_field( 'base47_canvas_mode_nonce', 'base47_canvas_mode_nonce' );
-    $value = get_post_meta( $post->ID, '_base47_canvas_mode', true );
+function nexus_canvas_mode_callback( $post ) {
+    wp_nonce_field( 'nexus_canvas_mode_nonce', 'nexus_canvas_mode_nonce' );
+    $value = get_post_meta( $post->ID, '_nexus_canvas_mode', true );
     ?>
     <label>
-        <input type="checkbox" name="base47_canvas_mode" value="1" <?php checked( $value, '1' ); ?>>
-        <?php esc_html_e( 'Enable Canvas Mode (No WordPress wrappers)', 'base47-theme' ); ?>
+        <input type="checkbox" name="nexus_canvas_mode" value="1" <?php checked( $value, '1' ); ?>>
+        <?php esc_html_e( 'Enable Canvas Mode (No WordPress wrappers)', 'nexus-theme' ); ?>
     </label>
     <p style="font-size: 11px; color: #666;">
-        <?php esc_html_e( 'Like Elementor Canvas – outputs pure HTML without WordPress header/footer. Perfect for Base47 HTML Editor / Mivon templates.', 'base47-theme' ); ?>
+        <?php esc_html_e( 'Like Elementor Canvas – outputs pure HTML without WordPress header/footer. Perfect for Base47 HTML Editor / Mivon templates.', 'nexus-theme' ); ?>
     </p>
     <?php
 }
 
 add_action( 'save_post', function( $post_id ) {
-    if ( ! isset( $_POST['base47_canvas_mode_nonce'] ) ||
-         ! wp_verify_nonce( wp_unslash( $_POST['base47_canvas_mode_nonce'] ), 'base47_canvas_mode_nonce' ) ) {
+    if ( ! isset( $_POST['nexus_canvas_mode_nonce'] ) ||
+         ! wp_verify_nonce( wp_unslash( $_POST['nexus_canvas_mode_nonce'] ), 'nexus_canvas_mode_nonce' ) ) {
         return;
     }
 
@@ -246,10 +245,10 @@ add_action( 'save_post', function( $post_id ) {
         return;
     }
 
-    if ( isset( $_POST['base47_canvas_mode'] ) ) {
-        update_post_meta( $post_id, '_base47_canvas_mode', '1' );
+    if ( isset( $_POST['nexus_canvas_mode'] ) ) {
+        update_post_meta( $post_id, '_nexus_canvas_mode', '1' );
     } else {
-        delete_post_meta( $post_id, '_base47_canvas_mode' );
+        delete_post_meta( $post_id, '_nexus_canvas_mode' );
     }
 } );
 
@@ -260,7 +259,7 @@ add_action( 'save_post', function( $post_id ) {
 
 add_filter( 'template_include', function( $template ) {
 
-    // If a page is explicitly set to "Base47 Canvas" template, respect that.
+    // If a page is explicitly set to "Nexus Canvas" template, respect that.
     if ( is_page_template( 'template-canvas.php' ) ) {
         return $template;
     }
@@ -273,7 +272,7 @@ add_filter( 'template_include', function( $template ) {
         }
 
         // Manual Canvas Mode via meta box
-        $canvas_enabled = get_post_meta( $post->ID, '_base47_canvas_mode', true );
+        $canvas_enabled = get_post_meta( $post->ID, '_nexus_canvas_mode', true );
 
         // Auto-detect Mivon / Base47 HTML templates in content
         $content = $post->post_content;
@@ -286,7 +285,7 @@ add_filter( 'template_include', function( $template ) {
 
         // Debug logging (remove after testing)
         if ( defined('WP_DEBUG') && WP_DEBUG ) {
-            error_log('Base47 Canvas Detection - Post ID: ' . $post->ID);
+            error_log('Nexus Canvas Detection - Post ID: ' . $post->ID);
             error_log('Canvas Enabled (meta): ' . ($canvas_enabled ? 'YES' : 'NO'));
             error_log('Has Mivon Content: ' . ($has_mivon_content ? 'YES' : 'NO'));
             error_log('Content preview: ' . substr($content, 0, 200));
@@ -307,24 +306,24 @@ add_filter( 'template_include', function( $template ) {
 }, 99 );
 
 /* ---------------------------------------------
- * GitHub Theme Updater (kept intact, just wrapped neatly)
+ * GitHub Theme Updater (updated for Nexus)
  * Checks latest release on GitHub and tells WP if an update exists.
  * ------------------------------------------ */
 
-function base47_github_updater( $transient ) {
+function nexus_github_updater( $transient ) {
 
     if ( empty( $transient->checked ) ) {
         return $transient;
     }
 
     // Theme folder MUST match your theme directory name
-    $theme_slug = 'base47-theme';
+    $theme_slug = 'nexus-theme';
 
     $theme           = wp_get_theme( $theme_slug );
     $current_version = $theme->get( 'Version' );
 
     // GitHub API for latest release
-    $response = wp_remote_get( 'https://api.github.com/repos/stefangoldltd-sudo/base47-theme/releases/latest' );
+    $response = wp_remote_get( 'https://api.github.com/repos/stefangoldltd-sudo/base47-nexus-theme/releases/latest' );
 
     if ( is_wp_error( $response ) ) {
         return $transient;
@@ -345,27 +344,27 @@ function base47_github_updater( $transient ) {
             'theme'       => $theme_slug,
             'new_version' => $latest_version,
             'package'     => $data->zipball_url,
-            'url'         => 'https://github.com/stefangoldltd-sudo/base47-theme',
+            'url'         => 'https://github.com/stefangoldltd-sudo/base47-nexus-theme',
         );
     }
 
     return $transient;
 }
-add_filter( 'pre_set_site_transient_update_themes', 'base47_github_updater' );
+add_filter( 'pre_set_site_transient_update_themes', 'nexus_github_updater' );
 
 /* ---------------------------------------------
  * Fix GitHub folder name issue
- * Forces WordPress to use 'base47-theme' as folder name
+ * Forces WordPress to use 'nexus-theme' as folder name
  * ------------------------------------------ */
-add_filter( 'upgrader_source_selection', 'base47_fix_github_folder_name', 10, 4 );
-function base47_fix_github_folder_name( $source, $remote_source, $upgrader, $extra ) {
+add_filter( 'upgrader_source_selection', 'nexus_fix_github_folder_name', 10, 4 );
+function nexus_fix_github_folder_name( $source, $remote_source, $upgrader, $extra ) {
     // Only run for theme updates
     if ( ! isset( $extra['theme'] ) ) {
         return $source;
     }
     
-    // Only run for base47-theme
-    if ( $extra['theme'] !== 'base47-theme' && strpos( $source, 'base47-theme' ) === false ) {
+    // Only run for nexus-theme
+    if ( $extra['theme'] !== 'nexus-theme' && strpos( $source, 'nexus-theme' ) === false ) {
         return $source;
     }
     
@@ -373,7 +372,7 @@ function base47_fix_github_folder_name( $source, $remote_source, $upgrader, $ext
     $parent_dir = dirname( $source );
     
     // New folder name
-    $new_source = trailingslashit( $parent_dir ) . 'base47-theme';
+    $new_source = trailingslashit( $parent_dir ) . 'nexus-theme';
     
     // Rename the folder
     if ( $source !== $new_source ) {
@@ -385,10 +384,28 @@ function base47_fix_github_folder_name( $source, $remote_source, $upgrader, $ext
 }
 
 /* ---------------------------------------------
- * (Optional) Load extra hooks file if you create inc/hooks.php later.
- * This does nothing if the file does not exist.
+ * Load Theme Enhancement Files
  * ------------------------------------------ */
 
+// Load customizer (Theme enhancement system)
+$customizer_file = get_template_directory() . '/inc/customizer.php';
+if ( file_exists( $customizer_file ) ) {
+    require_once $customizer_file;
+}
+
+// Load widget areas
+$widgets_file = get_template_directory() . '/inc/widgets.php';
+if ( file_exists( $widgets_file ) ) {
+    require_once $widgets_file;
+}
+
+// Load page builder compatibility
+$page_builders_file = get_template_directory() . '/inc/page-builders.php';
+if ( file_exists( $page_builders_file ) ) {
+    require_once $page_builders_file;
+}
+
+// Load extra hooks file
 $hooks_file = get_template_directory() . '/inc/hooks.php';
 if ( file_exists( $hooks_file ) ) {
     require_once $hooks_file;
