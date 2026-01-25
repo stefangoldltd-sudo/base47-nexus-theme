@@ -25,7 +25,7 @@ function nexus_theme_get_version() {
         $theme = $theme->parent();
     }
     $version = $theme->get( 'Version' );
-    return $version ? $version : '3.0.0';
+    return $version ? $version : '3.0.1';
 }
 
 /* ---------------------------------------------
