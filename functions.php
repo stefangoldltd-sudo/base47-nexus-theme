@@ -25,7 +25,7 @@ function nexus_theme_get_version() {
         $theme = $theme->parent();
     }
     $version = $theme->get( 'Version' );
-    return $version ? $version : '3.0.1';
+    return $version ? $version : '3.1.0';
 }
 
 /* ---------------------------------------------
@@ -162,6 +162,43 @@ function nexus_theme_scripts() {
         );
     }
 
+    // Header Builder CSS
+    $header_builder_path = get_template_directory() . '/assets/css/header-builder.css';
+    if ( file_exists( $header_builder_path ) ) {
+        wp_enqueue_style(
+            'nexus-header-builder',
+            $dir . '/assets/css/header-builder.css',
+            array( 'nexus-style' ),
+            $ver
+        );
+    }
+
+    // Mega Menu CSS
+    if ( get_theme_mod( 'nexus_mega_menu_enabled', true ) ) {
+        $mega_menu_path = get_template_directory() . '/assets/css/mega-menu.css';
+        if ( file_exists( $mega_menu_path ) ) {
+            wp_enqueue_style(
+                'nexus-mega-menu',
+                $dir . '/assets/css/mega-menu.css',
+                array( 'nexus-style' ),
+                $ver
+            );
+        }
+    }
+
+    // WooCommerce CSS
+    if ( class_exists( 'WooCommerce' ) ) {
+        $woocommerce_path = get_template_directory() . '/assets/css/woocommerce.css';
+        if ( file_exists( $woocommerce_path ) ) {
+            wp_enqueue_style(
+                'nexus-woocommerce',
+                $dir . '/assets/css/woocommerce.css',
+                array( 'nexus-style' ),
+                $ver
+            );
+        }
+    }
+
     // Optional theme JS – safe even if file is empty
     $js_path = get_template_directory() . '/assets/js/theme.js';
     if ( file_exists( $js_path ) ) {
@@ -173,8 +210,77 @@ function nexus_theme_scripts() {
             true
         );
     }
+
+    // Header Builder JS
+    $header_js_path = get_template_directory() . '/assets/js/header-builder.js';
+    if ( file_exists( $header_js_path ) ) {
+        wp_enqueue_script(
+            'nexus-header-builder',
+            $dir . '/assets/js/header-builder.js',
+            array( 'jquery' ),
+            $ver,
+            true
+        );
+
+        // Localize header script
+        wp_localize_script( 'nexus-header-builder', 'nexusHeader', array(
+            'homeUrl' => home_url( '/' ),
+            'searchPlaceholder' => __( 'Search...', 'nexus-theme' ),
+        ) );
+    }
+
+    // Mega Menu JS
+    if ( get_theme_mod( 'nexus_mega_menu_enabled', true ) ) {
+        $mega_menu_js_path = get_template_directory() . '/assets/js/mega-menu.js';
+        if ( file_exists( $mega_menu_js_path ) ) {
+            wp_enqueue_script(
+                'nexus-mega-menu',
+                $dir . '/assets/js/mega-menu.js',
+                array( 'jquery' ),
+                $ver,
+                true
+            );
+
+            // Localize mega menu script
+            wp_localize_script( 'nexus-mega-menu', 'nexusMegaMenu', array(
+                'animation' => get_theme_mod( 'nexus_mega_menu_animation', 'fade' ),
+                'mobileBreakpoint' => get_theme_mod( 'nexus_mega_menu_mobile_breakpoint', 768 ),
+            ) );
+        }
+    }
+
+    // Generate dynamic CSS
+    $dynamic_css = nexus_generate_dynamic_css();
+    if ( $dynamic_css ) {
+        wp_add_inline_style( 'nexus-style', $dynamic_css );
+    }
 }
 add_action( 'wp_enqueue_scripts', 'nexus_theme_scripts' );
+
+/* ---------------------------------------------
+ * Generate Dynamic CSS from Customizer Settings
+ * ------------------------------------------ */
+
+function nexus_generate_dynamic_css() {
+    $css = '';
+    
+    // Header Builder CSS
+    if ( function_exists( 'nexus_header_builder_css' ) ) {
+        $css .= nexus_header_builder_css();
+    }
+    
+    // Mega Menu CSS
+    if ( function_exists( 'nexus_mega_menu_css' ) ) {
+        $css .= nexus_mega_menu_css();
+    }
+    
+    // WooCommerce CSS
+    if ( function_exists( 'nexus_woocommerce_css' ) ) {
+        $css .= nexus_woocommerce_css();
+    }
+    
+    return $css;
+}
 
 /* ---------------------------------------------
  * RAW HTML: Remove automatic <p> / <br> wrappers
@@ -403,6 +509,30 @@ if ( file_exists( $widgets_file ) ) {
 $page_builders_file = get_template_directory() . '/inc/page-builders.php';
 if ( file_exists( $page_builders_file ) ) {
     require_once $page_builders_file;
+}
+
+// Load header builder
+$header_builder_file = get_template_directory() . '/inc/header-builder.php';
+if ( file_exists( $header_builder_file ) ) {
+    require_once $header_builder_file;
+}
+
+// Load mega menu system
+$mega_menu_file = get_template_directory() . '/inc/mega-menu.php';
+if ( file_exists( $mega_menu_file ) ) {
+    require_once $mega_menu_file;
+}
+
+// Load WooCommerce integration
+$woocommerce_file = get_template_directory() . '/inc/woocommerce.php';
+if ( file_exists( $woocommerce_file ) ) {
+    require_once $woocommerce_file;
+}
+
+// Load performance panel
+$performance_file = get_template_directory() . '/inc/performance.php';
+if ( file_exists( $performance_file ) ) {
+    require_once $performance_file;
 }
 
 // Load extra hooks file
