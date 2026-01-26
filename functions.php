@@ -25,7 +25,7 @@ function nexus_theme_get_version() {
         $theme = $theme->parent();
     }
     $version = $theme->get( 'Version' );
-    return $version ? $version : '3.2.2';
+    return $version ? $version : '3.2.3';
 }
 
 /* ---------------------------------------------
@@ -437,6 +437,11 @@ add_filter( 'template_include', function( $template ) {
         
         // Auto-detect Base47 App templates (dashboard, account, etc.)
         $has_app_content = (
+            // Base47 shortcodes (processed before HTML detection)
+            strpos( $content, '[base47_dashboard]' ) !== false ||
+            strpos( $content, '[base47_account]' ) !== false ||
+            strpos( $content, '[base47_portal' ) !== false ||
+            // HTML content patterns (after shortcode processing)
             strpos( $content, 'dashboard-section' ) !== false ||
             strpos( $content, 'account-section' ) !== false ||
             strpos( $content, 'app-section' ) !== false ||
