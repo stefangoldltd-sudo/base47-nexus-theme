@@ -1,8 +1,8 @@
 <?php
 /**
- * Template Name: Base47 Canvas App (Dashboard/Account Mode)
+ * Template Name: Base47 Canvas App
  * 
- * Specialized canvas mode for Base47 app templates (dashboard, account, etc.)
+ * Specialized canvas mode for Base47 templates
  * Handles WordPress login state and admin bar properly
  */
 

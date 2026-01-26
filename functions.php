@@ -25,7 +25,7 @@ function nexus_theme_get_version() {
         $theme = $theme->parent();
     }
     $version = $theme->get( 'Version' );
-    return $version ? $version : '3.2.1';
+    return $version ? $version : '3.2.2';
 }
 
 /* ---------------------------------------------
@@ -330,25 +330,25 @@ function nexus_canvas_mode_callback( $post ) {
             <?php esc_html_e( 'Canvas Mode (Pure HTML)', 'nexus-theme' ); ?>
         </label>
         <p style="font-size: 11px; color: #666; margin: 5px 0 0 20px;">
-            <?php esc_html_e( 'Like Elementor Canvas – outputs pure HTML without WordPress header/footer. Perfect for Mivon templates.', 'nexus-theme' ); ?>
+            <?php esc_html_e( 'Like Elementor Canvas – outputs pure HTML without WordPress header/footer. Perfect for HTML templates.', 'nexus-theme' ); ?>
         </p>
     </div>
     
     <div style="margin-bottom: 15px;">
         <label>
             <input type="radio" name="nexus_canvas_mode_type" value="app" <?php checked( $app_value, '1' ); ?>>
-            <?php esc_html_e( 'App Canvas Mode (Dashboard/Account)', 'nexus-theme' ); ?>
+            <?php esc_html_e( 'App Canvas Mode', 'nexus-theme' ); ?>
         </label>
         <p style="font-size: 11px; color: #666; margin: 5px 0 0 20px;">
-            <?php esc_html_e( 'Specialized for Base47 app templates (dashboard, account pages). Handles WordPress login state properly.', 'nexus-theme' ); ?>
+            <?php esc_html_e( 'Specialized for Base47 templates. Handles WordPress login state properly.', 'nexus-theme' ); ?>
         </p>
     </div>
     
     <div style="background: #f0f8ff; padding: 10px; border-radius: 4px; margin-top: 10px;">
         <strong style="color: #0073aa;">Auto-Detection:</strong><br>
         <small style="color: #666;">
-            • Canvas Mode: Auto-detected for Mivon templates<br>
-            • App Canvas: Auto-detected for dashboard/account content<br>
+            • Canvas Mode: Auto-detected for HTML templates<br>
+            • App Canvas: Auto-detected for Base47 content<br>
             • Manual selection overrides auto-detection
         </small>
     </div>
@@ -409,13 +409,30 @@ add_filter( 'template_include', function( $template ) {
         $canvas_enabled = get_post_meta( $post->ID, '_nexus_canvas_mode', true );
         $app_canvas_enabled = get_post_meta( $post->ID, '_nexus_canvas_app_mode', true );
 
-        // Auto-detect Mivon / Base47 HTML templates in content
+        // Auto-detect HTML templates in content (general detection)
         $content = $post->post_content;
-        $has_mivon_content = (
+        $has_html_template = (
+            // Base47/Mivon specific
             strpos( $content, '[mivon-' ) !== false ||
             strpos( $content, '[base47-' ) !== false ||
+            // Common HTML template patterns
             strpos( $content, 'class="header' ) !== false ||
-            strpos( $content, 'data-scroll-container' ) !== false
+            strpos( $content, 'data-scroll-container' ) !== false ||
+            strpos( $content, '<section class=' ) !== false ||
+            strpos( $content, 'data-aos=' ) !== false ||
+            strpos( $content, 'class="hero' ) !== false ||
+            strpos( $content, 'class="banner' ) !== false ||
+            strpos( $content, 'class="landing' ) !== false ||
+            // Bootstrap/Framework patterns
+            strpos( $content, 'class="container-fluid' ) !== false ||
+            strpos( $content, 'class="row"' ) !== false ||
+            strpos( $content, 'data-bs-' ) !== false ||
+            // Animation libraries
+            strpos( $content, 'data-wow-' ) !== false ||
+            strpos( $content, 'animate__' ) !== false ||
+            // Full HTML document patterns
+            strpos( $content, '<!DOCTYPE html>' ) !== false ||
+            strpos( $content, '<html lang=' ) !== false
         );
         
         // Auto-detect Base47 App templates (dashboard, account, etc.)
@@ -432,7 +449,7 @@ add_filter( 'template_include', function( $template ) {
         if ( defined('WP_DEBUG') && WP_DEBUG ) {
             error_log('Nexus Canvas Detection - Post ID: ' . $post->ID);
             error_log('Canvas Enabled (meta): ' . ($canvas_enabled ? 'YES' : 'NO'));
-            error_log('Has Mivon Content: ' . ($has_mivon_content ? 'YES' : 'NO'));
+            error_log('Has HTML Template: ' . ($has_html_template ? 'YES' : 'NO'));
             error_log('Has App Content: ' . ($has_app_content ? 'YES' : 'NO'));
             error_log('Content preview: ' . substr($content, 0, 200));
         }
@@ -448,8 +465,8 @@ add_filter( 'template_include', function( $template ) {
             }
         }
 
-        // Use regular Canvas template for other Base47/Mivon content
-        if ( $canvas_enabled || $has_mivon_content ) {
+        // Use regular Canvas template for HTML templates (manual or auto-detected)
+        if ( $canvas_enabled || $has_html_template ) {
             $canvas_template = get_template_directory() . '/template-canvas.php';
             if ( file_exists( $canvas_template ) ) {
                 if ( defined('WP_DEBUG') && WP_DEBUG ) {

@@ -271,7 +271,7 @@ function base47_page_builder_styles() {
             'base47-page-builders',
             get_template_directory_uri() . '/assets/css/page-builders.css',
             array( 'base47-style' ),
-            base47_theme_get_version()
+            nexus_theme_get_version()
         );
     }
 }
