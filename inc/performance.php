@@ -187,11 +187,14 @@ function nexus_performance_customizer( $wp_customize ) {
         'sanitize_callback' => 'wp_strip_all_tags',
     ) );
 
-    $wp_customize->add_control( new Nexus_Info_Control( $wp_customize, 'nexus_caching_info', array(
-        'label'       => __( '💡 Caching Recommendations', 'nexus-theme' ),
-        'section'     => 'nexus_performance',
-        'description' => __( 'For maximum performance, consider using:<br>• WP Rocket (Premium)<br>• W3 Total Cache (Free)<br>• WP Super Cache (Free)<br>• LiteSpeed Cache (Free)', 'nexus-theme' ),
-    ) ) );
+    // Only create custom control if WP_Customize_Control exists
+    if ( class_exists( 'WP_Customize_Control' ) ) {
+        $wp_customize->add_control( new Nexus_Performance_Info_Control( $wp_customize, 'nexus_caching_info', array(
+            'label'       => __( '💡 Caching Recommendations', 'nexus-theme' ),
+            'section'     => 'nexus_performance',
+            'description' => __( 'For maximum performance, consider using:<br>• WP Rocket (Premium)<br>• W3 Total Cache (Free)<br>• WP Super Cache (Free)<br>• LiteSpeed Cache (Free)', 'nexus-theme' ),
+        ) ) );
+    }
 }
 add_action( 'customize_register', 'nexus_performance_customizer' );
 
@@ -214,12 +217,12 @@ function nexus_performance_init() {
     
     // Disable Emojis
     if ( get_theme_mod( 'nexus_disable_emojis', true ) ) {
-        nexus_disable_emojis();
+        nexus_performance_disable_emojis();
     }
     
     // Disable Embeds
     if ( get_theme_mod( 'nexus_disable_embeds', false ) ) {
-        nexus_disable_embeds();
+        nexus_performance_disable_embeds();
     }
     
     // Disable XML-RPC
@@ -274,7 +277,7 @@ function nexus_remove_query_strings( $src ) {
 /**
  * Disable WordPress Emojis
  */
-function nexus_disable_emojis() {
+function nexus_performance_disable_emojis() {
     remove_action( 'wp_head', 'print_emoji_detection_script', 7 );
     remove_action( 'admin_print_scripts', 'print_emoji_detection_script' );
     remove_action( 'wp_print_styles', 'print_emoji_styles' );
@@ -283,11 +286,11 @@ function nexus_disable_emojis() {
     remove_filter( 'comment_text_rss', 'wp_staticize_emoji' );
     remove_filter( 'wp_mail', 'wp_staticize_emoji_for_email' );
     
-    add_filter( 'tiny_mce_plugins', 'nexus_disable_emojis_tinymce' );
-    add_filter( 'wp_resource_hints', 'nexus_disable_emojis_dns_prefetch', 10, 2 );
+    add_filter( 'tiny_mce_plugins', 'nexus_performance_disable_emojis_tinymce' );
+    add_filter( 'wp_resource_hints', 'nexus_performance_disable_emojis_dns_prefetch', 10, 2 );
 }
 
-function nexus_disable_emojis_tinymce( $plugins ) {
+function nexus_performance_disable_emojis_tinymce( $plugins ) {
     if ( is_array( $plugins ) ) {
         return array_diff( $plugins, array( 'wpemoji' ) );
     } else {
@@ -295,7 +298,7 @@ function nexus_disable_emojis_tinymce( $plugins ) {
     }
 }
 
-function nexus_disable_emojis_dns_prefetch( $urls, $relation_type ) {
+function nexus_performance_disable_emojis_dns_prefetch( $urls, $relation_type ) {
     if ( 'dns-prefetch' == $relation_type ) {
         $emoji_svg_url = apply_filters( 'emoji_svg_url', 'https://s.w.org/images/core/emoji/2/svg/' );
         $urls = array_diff( $urls, array( $emoji_svg_url ) );
@@ -306,21 +309,21 @@ function nexus_disable_emojis_dns_prefetch( $urls, $relation_type ) {
 /**
  * Disable WordPress Embeds
  */
-function nexus_disable_embeds() {
+function nexus_performance_disable_embeds() {
     remove_action( 'wp_head', 'wp_oembed_add_discovery_links' );
     remove_action( 'wp_head', 'wp_oembed_add_host_js' );
     remove_action( 'rest_api_init', 'wp_oembed_register_route' );
     remove_filter( 'oembed_dataparse', 'wp_filter_oembed_result', 10 );
     add_filter( 'embed_oembed_discover', '__return_false' );
-    add_filter( 'tiny_mce_plugins', 'nexus_disable_embeds_tiny_mce_plugin' );
-    add_filter( 'rewrite_rules_array', 'nexus_disable_embeds_rewrites' );
+    add_filter( 'tiny_mce_plugins', 'nexus_performance_disable_embeds_tiny_mce_plugin' );
+    add_filter( 'rewrite_rules_array', 'nexus_performance_disable_embeds_rewrites' );
 }
 
-function nexus_disable_embeds_tiny_mce_plugin( $plugins ) {
+function nexus_performance_disable_embeds_tiny_mce_plugin( $plugins ) {
     return array_diff( $plugins, array( 'wpembed' ) );
 }
 
-function nexus_disable_embeds_rewrites( $rules ) {
+function nexus_performance_disable_embeds_rewrites( $rules ) {
     foreach ( $rules as $rule => $rewrite ) {
         if ( false !== strpos( $rewrite, 'embed=true' ) ) {
             unset( $rules[ $rule ] );
@@ -579,16 +582,22 @@ function nexus_performance_widget_content() {
 
 /**
  * Custom Info Control for Customizer
+ * Only define when WP_Customize_Control is available
  */
-class Nexus_Info_Control extends WP_Customize_Control {
-    public $type = 'info';
-    
-    public function render_content() {
-        ?>
-        <label>
-            <span class="customize-control-title"><?php echo esc_html( $this->label ); ?></span>
-            <span class="description customize-control-description"><?php echo wp_kses_post( $this->description ); ?></span>
-        </label>
-        <?php
+function nexus_performance_register_custom_controls() {
+    if ( class_exists( 'WP_Customize_Control' ) ) {
+        class Nexus_Performance_Info_Control extends WP_Customize_Control {
+            public $type = 'info';
+            
+            public function render_content() {
+                ?>
+                <label>
+                    <span class="customize-control-title"><?php echo esc_html( $this->label ); ?></span>
+                    <span class="description customize-control-description"><?php echo wp_kses_post( $this->description ); ?></span>
+                </label>
+                <?php
+            }
+        }
     }
 }
+add_action( 'customize_register', 'nexus_performance_register_custom_controls', 1 );
