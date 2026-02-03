@@ -3,11 +3,15 @@ Theme Name: Nexus
 Theme URI: https://47-studio.com/base47
 Author: Base47
 Author URI: https://47-studio.com/base47
-Description: Professional WordPress theme with unique Canvas Mode, comprehensive customizer, and Base47 HTML Editor integration. The perfect nexus between HTML templates and WordPress. Now includes Header Builder, Mega Menus, WooCommerce Integration, and Performance Panel.
-Version: 3.2.3
+Description: Clean, responsive WordPress theme with customizable layouts, navigation options, and Canvas Mode for custom HTML layouts. Compatible with popular page builders and WooCommerce.
+Version: 4.0.0
+License: GPL v2 or later
+License URI: https://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: nexus-theme
-Tags: canvas-mode, page-builders, customizer, responsive, performance, html-templates, dual-mode, header-builder, mega-menu, woocommerce, ecommerce
-Update URI: https://api.github.com/repos/stefangoldltd-sudo/base47-nexus-theme
+Tags: custom-header, custom-menu, featured-images, flexible-header, footer-widgets, full-width-template, theme-options, threaded-comments, translation-ready
+Requires at least: 5.0
+Tested up to: 6.4
+Requires PHP: 7.4
 */
 
 /* ------------------------------------
@@ -104,23 +108,16 @@ body.base47-canvas {
 }
 
 body.base47-canvas * {
-    /* Let Mivon templates control everything */
+    /* Let Canvas templates control everything */
     box-sizing: border-box;
 }
 
-/* Remove admin bar in canvas mode */
-body.base47-canvas #wpadminbar,
-body.base47-canvas.admin-bar #wpadminbar {
-    display: none !important;
-}
-
-/* Remove admin bar spacing */
+/* Canvas mode styling (admin bar remains visible for accessibility) */
 body.base47-canvas.admin-bar {
-    margin-top: 0 !important;
-    padding-top: 0 !important;
+    /* Canvas-specific admin bar handling can go here if needed */
 }
 
-/* Ensure canvas content starts at top */
+/* Ensure canvas content layout */
 body.base47-canvas #page,
 body.base47-canvas .base47-site {
     margin-top: 0 !important;
