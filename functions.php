@@ -248,6 +248,9 @@ function nexus_canvas_mode_callback( $post ) {
     $app_value = get_post_meta( $post->ID, '_nexus_canvas_app_mode', true );
     
     // Check if Base47 HTML Editor plugin is active
+    if ( ! function_exists( 'is_plugin_active' ) ) {
+        include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
+    }
     $plugin_active = is_plugin_active( 'base47-html-editor/base47-html-editor.php' );
     ?>
     <div style="margin-bottom: 15px;">
