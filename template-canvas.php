@@ -1,49 +1,41 @@
 <?php
 /**
- * Template Name: Base47 Canvas (Raw HTML Mode)
+ * Template Name: Base47 Canvas (No WordPress Wrappers)
+ * Description: Pure HTML output - like Elementor Canvas mode
  * 
- * Pure HTML output - bypasses WordPress completely
+ * This template completely bypasses WordPress wrappers
+ * Perfect for Mivon HTML Editor templates
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
-
-// Disable admin bar
-show_admin_bar( false );
-
-// Set pure canvas mode flag
-$GLOBALS['base47_pure_canvas_mode'] = true;
-
-// Get the post content and process shortcodes
-while ( have_posts() ) : the_post();
-    $content = do_shortcode( get_the_content( null, false, $post ) );
-endwhile;
-
-// Extract <head> content (CSS, scripts)
-$head_content = '';
-if ( preg_match( '#<head\b[^>]*>(.*?)</head>#is', $content, $head_match ) ) {
-    $head_content = $head_match[1];
-}
-
-// Extract <body> content (HTML)
-$body_content = '';
-if ( preg_match( '#<body\b[^>]*>(.*?)</body>#is', $content, $body_match ) ) {
-    $body_content = $body_match[1];
-}
-
-// Output pure HTML - NO WordPress hooks
-?><!DOCTYPE html>
-<html lang="en">
+?>
+<!DOCTYPE html>
+<html <?php language_attributes(); ?>>
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <?php echo $head_content; ?>
+    <meta charset="<?php bloginfo('charset'); ?>">
+    
+    <!-- Enhanced viewport for mobile - iOS Safari fix -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    
+    <!-- iOS-specific optimizations -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="format-detection" content="telephone=no">
+
+    <?php wp_head(); ?>
 </head>
-<body>
-<?php echo $body_content; ?>
+<body <?php body_class('base47-canvas'); ?>>
+
+<?php
+// PURE HTML OUTPUT - NO WRAPPERS AT ALL
+while ( have_posts() ) : the_post();
+    the_content();
+endwhile;
+?>
+
+<?php wp_footer(); ?>
 </body>
 </html>
-<?php
-exit; // Stop WordPress immediately
-?>

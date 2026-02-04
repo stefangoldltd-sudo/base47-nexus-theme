@@ -2,51 +2,29 @@
 /**
  * Template Name: Base47 Canvas App
  * 
- * Specialized canvas mode for Base47 templates
+ * Specialized canvas mode for Base47 app templates
  * Handles WordPress login state and admin bar properly
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
-
-// Set app canvas mode flag
-$GLOBALS['base47_app_canvas_mode'] = true;
-
-// Get the post content and process shortcodes
-while ( have_posts() ) : the_post();
-    $content = do_shortcode( get_the_content( null, false, $post ) );
-endwhile;
-
-// Extract <head> content (CSS, scripts)
-$head_content = '';
-if ( preg_match( '#<head\b[^>]*>(.*?)</head>#is', $content, $head_match ) ) {
-    $head_content = $head_match[1];
-}
-
-// Extract <body> content (HTML)
-$body_content = '';
-if ( preg_match( '#<body\b[^>]*>(.*?)</body>#is', $content, $body_match ) ) {
-    $body_content = $body_match[1];
-} else {
-    // If no body tags found, use entire content
-    $body_content = $content;
-}
-
-// Check if user is logged in and admin bar should show
-$show_admin_bar = is_user_logged_in() && is_admin_bar_showing();
-$admin_bar_class = $show_admin_bar ? 'admin-bar' : '';
-
-// Output app canvas HTML with WordPress compatibility
-?><!DOCTYPE html>
+?>
+<!DOCTYPE html>
 <html <?php language_attributes(); ?>>
 <head>
     <meta charset="<?php bloginfo( 'charset' ); ?>">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <?php 
-    // Include WordPress head for login state, admin bar, etc.
-    wp_head(); 
-    ?>
+    
+    <!-- Enhanced viewport for mobile - iOS Safari fix -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    
+    <!-- iOS-specific optimizations -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="format-detection" content="telephone=no">
+
+    <?php wp_head(); ?>
     
     <!-- App Canvas Mode Styles -->
     <style>
@@ -84,16 +62,16 @@ $admin_bar_class = $show_admin_bar ? 'admin-bar' : '';
         }
         
         /* Admin bar compensation for logged-in users */
-        body.admin-bar {
-            margin-top: 0 !important;
-        }
-        
-        body.admin-bar .dashboard-section {
+        body.admin-bar .dashboard-section,
+        body.admin-bar .account-section,
+        body.admin-bar .app-section {
             padding-top: 72px !important;
         }
         
         @media screen and (max-width: 782px) {
-            body.admin-bar .dashboard-section {
+            body.admin-bar .dashboard-section,
+            body.admin-bar .account-section,
+            body.admin-bar .app-section {
                 padding-top: 86px !important;
             }
         }
@@ -122,25 +100,15 @@ $admin_bar_class = $show_admin_bar ? 'admin-bar' : '';
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
         }
     </style>
-    
-    <?php echo $head_content; ?>
 </head>
-<body <?php body_class( $admin_bar_class . ' base47-app-canvas' ); ?>>
+<body <?php body_class('base47-app-canvas'); ?>>
 
-<?php 
-// Show admin bar if user is logged in
-if ( $show_admin_bar ) {
-    wp_admin_bar_render();
-}
+<?php
+// PURE HTML OUTPUT - NO WRAPPERS AT ALL
+while ( have_posts() ) : the_post();
+    the_content();
+endwhile;
 ?>
-
-<div id="page" class="site">
-    <main id="main" class="site-main">
-        <article class="entry-content">
-            <?php echo $body_content; ?>
-        </article>
-    </main>
-</div>
 
 <?php wp_footer(); ?>
 
@@ -178,6 +146,3 @@ document.addEventListener('DOMContentLoaded', function() {
 
 </body>
 </html>
-<?php
-// Don't exit like pure canvas - we need WordPress footer for login state
-?>
