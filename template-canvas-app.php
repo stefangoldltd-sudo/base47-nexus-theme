@@ -3,19 +3,41 @@
  * Template Name: Base47 Canvas App
  * 
  * Specialized canvas mode for Base47 app templates
- * Handles WordPress login state and admin bar properly
+ * Pure HTML output with app-specific optimizations
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
-?>
-<!DOCTYPE html>
+
+// Disable admin bar
+show_admin_bar( false );
+
+// Set pure canvas mode flag - CRITICAL for proper rendering
+$GLOBALS['base47_pure_canvas_mode'] = true;
+
+// Get the post content and process shortcodes
+while ( have_posts() ) : the_post();
+    $content = do_shortcode( get_the_content( null, false, $post ) );
+endwhile;
+
+// Extract <head> content (CSS, scripts)
+$head_content = '';
+if ( preg_match( '#<head\b[^>]*>(.*?)</head>#is', $content, $head_match ) ) {
+    $head_content = $head_match[1];
+}
+
+// Extract <body> content (HTML)
+$body_content = '';
+if ( preg_match( '#<body\b[^>]*>(.*?)</body>#is', $content, $body_match ) ) {
+    $body_content = $body_match[1];
+}
+
+// Output pure HTML - NO WordPress hooks
+?><!DOCTYPE html>
 <html <?php language_attributes(); ?>>
 <head>
     <meta charset="<?php bloginfo( 'charset' ); ?>">
-    
-    <!-- Enhanced viewport for mobile - iOS Safari fix -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     
@@ -23,126 +45,78 @@ if ( ! defined( 'ABSPATH' ) ) {
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="format-detection" content="telephone=no">
-
-    <?php wp_head(); ?>
     
-    <!-- App Canvas Mode Styles -->
+    <?php echo $head_content; ?>
+    
+    <!-- Safe Canvas App Mode Fix -->
     <style>
-        /* Force app canvas mode - override all WordPress styling */
-        html, body {
+        /* Safe Canvas App Mode CSS - Only affects Canvas App pages */
+        body.base47-app-canvas {
             margin: 0 !important;
             padding: 0 !important;
-            background: #fafafa !important;
-            min-height: 100vh !important;
-            overflow-x: hidden !important;
         }
         
-        /* Hide WordPress elements that interfere with app layout */
-        .wp-site-blocks,
-        .wp-block-group,
-        .site-header,
-        .site-footer,
-        .entry-header,
-        .entry-footer {
+        /* Hide WordPress elements on Canvas App pages only */
+        body.base47-app-canvas .scroll-to-top,
+        body.base47-app-canvas #wpadminbar,
+        body.base47-app-canvas .wp-toolbar {
             display: none !important;
         }
         
-        /* Ensure main content area is clean */
-        #page,
-        .site,
-        .site-main,
-        main,
-        article,
-        .entry-content {
-            margin: 0 !important;
-            padding: 0 !important;
-            width: 100% !important;
-            max-width: 100% !important;
-            background: transparent !important;
+        /* Admin bar spacing */
+        <?php if ( is_admin_bar_showing() ) : ?>
+        body.base47-app-canvas {
+            padding-top: 32px !important;
         }
-        
-        /* Admin bar compensation for logged-in users */
-        body.admin-bar .dashboard-section,
-        body.admin-bar .account-section,
-        body.admin-bar .app-section {
-            padding-top: 72px !important;
-        }
-        
-        @media screen and (max-width: 782px) {
-            body.admin-bar .dashboard-section,
-            body.admin-bar .account-section,
-            body.admin-bar .app-section {
-                padding-top: 86px !important;
+        @media screen and (max-width: 782px) { 
+            body.base47-app-canvas {
+                padding-top: 46px !important;
             }
         }
+        <?php endif; ?>
         
-        /* Force app content to be visible and properly styled */
-        .dashboard-section,
-        .account-section,
-        .app-section {
-            display: block !important;
-            background: #fafafa !important;
-            min-height: 100vh !important;
-            position: relative !important;
-            z-index: 1 !important;
+        /* Fix first section positioning - Universal fix for ALL templates */
+        body.base47-app-canvas > *:first-child,
+        body.base47-app-canvas > section:first-of-type,
+        body.base47-app-canvas > div:first-of-type,
+        body.base47-app-canvas .hero-style1,
+        body.base47-app-canvas .hero-style4,
+        body.base47-app-canvas .pg-hero {
+            margin-top: 0 !important;
+            padding-top: 100px !important; /* Space for fixed header */
         }
         
-        /* Remove any WordPress container constraints */
-        .container,
-        .wp-container {
-            max-width: none !important;
-            padding: 0 !important;
-            margin: 0 !important;
-        }
-        
-        /* Ensure proper font loading */
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+        /* Mobile spacing adjustment */
+        @media screen and (max-width: 991px) {
+            body.base47-app-canvas > *:first-child,
+            body.base47-app-canvas > section:first-of-type,
+            body.base47-app-canvas > div:first-of-type,
+            body.base47-app-canvas .hero-style1,
+            body.base47-app-canvas .hero-style4,
+            body.base47-app-canvas .pg-hero {
+                padding-top: 80px !important;
+            }
         }
     </style>
+    
+    <!-- Safe JavaScript fixes -->
+    <script>
+        window.addEventListener('DOMContentLoaded', function() {
+            // Remove theme's scroll-to-top button
+            const scrollButtons = document.querySelectorAll('.scroll-to-top');
+            scrollButtons.forEach(btn => btn.remove());
+            
+            // Disable theme's scroll-to-top setup if it exists
+            if (window.NexusTheme && window.NexusTheme.setupScrollToTop) {
+                window.NexusTheme.setupScrollToTop = function() {};
+            }
+        });
+    </script>
 </head>
-<body <?php body_class('base47-app-canvas'); ?>>
-
-<?php
-// PURE HTML OUTPUT - NO WRAPPERS AT ALL
-while ( have_posts() ) : the_post();
-    the_content();
-endwhile;
-?>
-
-<?php wp_footer(); ?>
-
-<script>
-// Enhanced app canvas mode JavaScript
-document.addEventListener('DOMContentLoaded', function() {
-    // Force app canvas styling
-    document.body.style.background = '#fafafa';
-    document.documentElement.style.background = '#fafafa';
-    
-    // Ensure app sections are visible
-    const appSections = document.querySelectorAll('.dashboard-section, .account-section, .app-section');
-    appSections.forEach(section => {
-        section.style.display = 'block';
-        section.style.minHeight = '100vh';
-        section.style.background = '#fafafa';
-    });
-    
-    // Handle admin bar spacing dynamically
-    const adminBar = document.getElementById('wpadminbar');
-    const dashboardSection = document.querySelector('.dashboard-section, .account-section, .app-section');
-    
-    if (adminBar && dashboardSection) {
-        const adminBarHeight = adminBar.offsetHeight;
-        dashboardSection.style.paddingTop = (adminBarHeight + 40) + 'px';
-    }
-    
-    // Remove WordPress body classes that might interfere
-    document.body.classList.remove('wp-embed-responsive', 'wp-custom-logo');
-    
-    // Add app canvas class
-    document.body.classList.add('base47-app-canvas');
-});
-</script>
-
+<body class="base47-app-canvas">
+<?php echo $body_content; ?>
 </body>
 </html>
+<?php
+exit; // Stop WordPress immediately - CRITICAL
+?>

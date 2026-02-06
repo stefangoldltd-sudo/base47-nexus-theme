@@ -80,6 +80,12 @@
         
         // Scroll to Top
         setupScrollToTop: function() {
+            // Don't add scroll-to-top on Canvas Mode pages
+            if (document.body.classList.contains('base47-canvas') || 
+                document.body.classList.contains('base47-app-canvas')) {
+                return;
+            }
+            
             var $scrollToTop = $('<button class="scroll-to-top" aria-label="Scroll to top"><i class="fas fa-chevron-up"></i></button>');
             $('body').append($scrollToTop);
             

@@ -49,6 +49,71 @@ a {
 }
 
 /* ------------------------------------
+   2. CANVAS MODE - First Section Fix
+   Pure HTML - Zero WordPress interference
+------------------------------------ */
+
+body.base47-canvas {
+    margin: 0 !important;
+    padding: 0 !important;
+    /* DO NOT set background - let templates control it */
+}
+
+body.base47-canvas * {
+    /* Let templates control everything */
+    box-sizing: border-box;
+}
+
+/* ------------------------------------
+   3. MOBILE-SPECIFIC FIXES
+   Block WordPress button styles that override templates
+------------------------------------ */
+
+@media (max-width: 768px) {
+    /* Force remove any WordPress button styling */
+    .wp-block-button__link,
+    .wp-block-file__button {
+        all: unset !important;
+    }
+    
+    /* Ensure template containers work on mobile */
+    .container,
+    .row,
+    section {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+    
+    /* Fix any WordPress-added padding on mobile */
+    body.page,
+    body.single,
+    body.home {
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+    
+    /* FIX: First section always broken - kill ALL wrappers */
+    body > *:not(script):not(style),
+    #page,
+    main,
+    article,
+    .entry-content > *:first-child,
+    section:first-of-type,
+    .header,
+    header {
+        margin-top: 0 !important;
+        padding-top: 0 !important;
+    }
+    
+    /* Ensure first template section displays correctly */
+    body {
+        overflow-x: hidden !important;
+    }
+}
+
+/* ------------------------------------
    2. STOP WORDPRESS / THEMES 
       from adding layout interference
 ------------------------------------ */
@@ -186,5 +251,61 @@ body.base47-canvas .b47-page-inner {
     /* Ensure first Mivon section displays correctly */
     body {
         overflow-x: hidden !important;
+    }
+}
+
+/* --------------------------------
+   6. SCROLL-TO-TOP BUTTON STYLING
+------------------------------------ */
+
+.scroll-to-top {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 50px;
+    height: 50px;
+    background-color: #ff4d00;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    z-index: 9999;
+    box-shadow: 0 4px 12px rgba(255, 77, 0, 0.3);
+}
+
+.scroll-to-top:hover {
+    background-color: #e63900;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(255, 77, 0, 0.4);
+}
+
+.scroll-to-top.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+.scroll-to-top i {
+    font-size: 18px;
+}
+
+/* Hide scroll-to-top on Canvas Mode pages */
+body.base47-canvas .scroll-to-top,
+body.base47-app-canvas .scroll-to-top {
+    display: none !important;
+}
+
+@media (max-width: 768px) {
+    .scroll-to-top {
+        bottom: 20px;
+        right: 20px;
+        width: 45px;
+        height: 45px;
+    }
+    
+    .scroll-to-top i {
+        font-size: 16px;
     }
 }
